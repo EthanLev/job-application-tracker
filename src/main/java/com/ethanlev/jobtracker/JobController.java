@@ -15,20 +15,11 @@ public class JobController {
     public JobController() {
         jobs.add(new JobApplication(
                 1L,
-                "Google",
-                "Software Engineer",
-                "APPLIED",
+                "Company",
+                "Job",
+                "Status",
                 "05/12/2026",
-                "Indeed"
-        ));
-
-        jobs.add(new JobApplication(
-                2L,
-                "Amazon",
-                "Software Developer",
-                "INTERVIEWED",
-                "05/10/2026",
-                "LinkedIn"
+                "Notes"
         ));
     }
 
@@ -66,5 +57,29 @@ public class JobController {
         jobs.add(newJob);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(newJob);
+    }
+
+    // PUT /jobs/{id}
+    // Finds existing job by id and replaces all its fields
+    @PutMapping("/{id}")
+    public ResponseEntity<JobApplication> updateJob(
+            @PathVariable Long id,
+            @RequestBody JobApplication updatedJob) {
+
+        for (JobApplication job : jobs) {
+            if (job.getId().equals(id)) {
+
+                // Replace all fields with the new values from the request body
+                job.setCompany(updatedJob.getCompany());
+                job.setJobTitle(updatedJob.getJobTitle());
+                job.setStatus(updatedJob.getStatus());
+                job.setDateApplied(updatedJob.getDateApplied());
+                job.setNotes(updatedJob.getNotes());
+
+                return ResponseEntity.ok(job);
+            }
+        }
+
+        return ResponseEntity.notFound().build();
     }
 }
