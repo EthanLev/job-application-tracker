@@ -13,14 +13,7 @@ public class JobController {
     private List<JobApplication> jobs = new ArrayList<>();
 
     public JobController() {
-        jobs.add(new JobApplication(
-                1L,
-                "Company",
-                "Job",
-                "Status",
-                "05/12/2026",
-                "Notes"
-        ));
+
     }
 
     // GET /jobs
