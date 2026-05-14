@@ -62,9 +62,7 @@ public class JobController {
     // PUT /jobs/{id}
     // Finds existing job by id and replaces all its fields
     @PutMapping("/{id}")
-    public ResponseEntity<JobApplication> updateJob(
-            @PathVariable Long id,
-            @RequestBody JobApplication updatedJob) {
+    public ResponseEntity<JobApplication> updateJob(@PathVariable Long id, @RequestBody JobApplication updatedJob) {
 
         for (JobApplication job : jobs) {
             if (job.getId().equals(id)) {
@@ -80,6 +78,19 @@ public class JobController {
             }
         }
 
+        return ResponseEntity.notFound().build();
+    }
+
+    // DELETE /jobs/{id}
+    // Finds job by id and removes it from list
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteJob(@PathVariable Long id) {
+        for (JobApplication job : jobs) {
+            if (job.getId().equals(id)) {
+                jobs.remove(job);
+                return ResponseEntity.noContent().build();
+            }
+        }
         return ResponseEntity.notFound().build();
     }
 }
