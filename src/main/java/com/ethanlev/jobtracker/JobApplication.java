@@ -1,11 +1,32 @@
 package com.ethanlev.jobtracker;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "job_application")
 public class JobApplication {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "company")
     private String company;
+
+    @Column(name = "job_title")
     private String jobTitle;
+
+    @Column(name = "status")
     private String status;
+
+    @Column(name = "date_applied")
     private String dateApplied;
+
+    @Column(name = "notes")
     private String notes;
 
     // Constructor
@@ -18,6 +39,8 @@ public class JobApplication {
         this.dateApplied = dateApplied;
         this.notes = notes;
     }
+
+    public JobApplication() {}
 
     // Getters
     public Long getId() { return id; }
