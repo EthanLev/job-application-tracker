@@ -1,89 +1,85 @@
 package com.ethanlev.jobtracker;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/jobs")
 public class JobController {
-    private List<JobApplication> jobs = new ArrayList<>();
 
-    public JobController() {
+    private final JobApplicationRepository repository;
 
+    // Spring sees @Autowired and automatically provides a
+    // JobApplicationRepository instance — you never call new on it yourself
+    @Autowired
+    public JobController(JobApplicationRepository repository) {
+        this.repository = repository;
     }
 
-    // GET /jobs
-    // Returns list of JobApplication objects in JSON
+    // GET /jobs — fetch all jobs from the database
     @GetMapping
     public List<JobApplication> getAllJobs() {
-        return jobs;
+        return repository.findAll();
     }
 
-    // GET /jobs/{id}
-    // Returns JobApplication by ID
-    // ID in the URL is dynamic - caller supplies the number
+    // GET /jobs/{id} — fetch one job by id
     @GetMapping("/{id}")
     public ResponseEntity<JobApplication> getJobById(@PathVariable Long id) {
-        // Search list for job with corresponding id from URL
-        for (JobApplication job : jobs) {
-            if (job.getId().equals(id)) {
-                return ResponseEntity.ok(job);
-            }
+        Optional<JobApplication> job = repository.findById(id);
+
+        if (job.isPresent()) {
+            return ResponseEntity.ok(job.get());
         }
 
-        // No match found - return 404 Not Found
         return ResponseEntity.notFound().build();
     }
 
-    // POST /jobs
-    // Accepts JSON body, creates a new job, adds it to the jobs list
+    // POST /jobs — save a new job to the database
     @PostMapping
     public ResponseEntity<JobApplication> createJob(@RequestBody JobApplication newJob) {
-        // Generate ID based on current list size
-        Long newId = (long) (jobs.size() + 1);
-        newJob.setId(newId);
-
-        jobs.add(newJob);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(newJob);
+        // PostgreSQL auto-generates the id — we no longer set it manually
+        JobApplication saved = repository.save(newJob);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
-    // PUT /jobs/{id}
-    // Finds existing job by id and replaces all its fields
+    // PUT /jobs/{id} — update an existing job
     @PutMapping("/{id}")
-    public ResponseEntity<JobApplication> updateJob(@PathVariable Long id, @RequestBody JobApplication updatedJob) {
+    public ResponseEntity<JobApplication> updateJob(
+            @PathVariable Long id,
+            @RequestBody JobApplication updatedJob) {
 
-        for (JobApplication job : jobs) {
-            if (job.getId().equals(id)) {
-
-                // Replace all fields with the new values from the request body
-                job.setCompany(updatedJob.getCompany());
-                job.setJobTitle(updatedJob.getJobTitle());
-                job.setStatus(updatedJob.getStatus());
-                job.setDateApplied(updatedJob.getDateApplied());
-                job.setNotes(updatedJob.getNotes());
-
-                return ResponseEntity.ok(job);
-            }
+        if (!repository.existsById(id)) {
+            return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.notFound().build();
+        // Set the id so repository.save() updates the existing row
+        // instead of inserting a new one
+        updatedJob.setId(id);
+        JobApplication saved = repository.save(updatedJob);
+        return ResponseEntity.ok(saved);
     }
 
-    // DELETE /jobs/{id}
-    // Finds job by id and removes it from list
+    // DELETE /jobs/{id} — delete a job by id
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteJob(@PathVariable Long id) {
-        for (JobApplication job : jobs) {
-            if (job.getId().equals(id)) {
-                jobs.remove(job);
-                return ResponseEntity.noContent().build();
-            }
+        if (!repository.existsById(id)) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
+
+        repository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
+
 }
