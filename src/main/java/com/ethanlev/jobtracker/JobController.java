@@ -44,7 +44,7 @@ public class JobController {
             return ResponseEntity.ok(job.get());
         }
 
-        return ResponseEntity.notFound().build();
+        throw new ResourceNotFoundException("Job application not found with id: " + id);
     }
 
     // POST /jobs — save a new job to the database
@@ -62,7 +62,7 @@ public class JobController {
             @Valid @RequestBody JobApplication updatedJob) {
 
         if (!repository.existsById(id)) {
-            return ResponseEntity.notFound().build();
+            throw new ResourceNotFoundException("Job application not found with id: " + id);
         }
 
         // Set the id so repository.save() updates the existing row
@@ -76,7 +76,7 @@ public class JobController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteJob(@PathVariable Long id) {
         if (!repository.existsById(id)) {
-            return ResponseEntity.notFound().build();
+            throw new ResourceNotFoundException("Job application not found with id: " + id);
         }
 
         repository.deleteById(id);
