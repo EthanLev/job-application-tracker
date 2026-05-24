@@ -1,5 +1,6 @@
 package com.ethanlev.jobtracker;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +49,7 @@ public class JobController {
 
     // POST /jobs — save a new job to the database
     @PostMapping
-    public ResponseEntity<JobApplication> createJob(@RequestBody JobApplication newJob) {
+    public ResponseEntity<JobApplication> createJob(@Valid @RequestBody JobApplication newJob) {
         // PostgreSQL auto-generates the id — we no longer set it manually
         JobApplication saved = repository.save(newJob);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
@@ -58,7 +59,7 @@ public class JobController {
     @PutMapping("/{id}")
     public ResponseEntity<JobApplication> updateJob(
             @PathVariable Long id,
-            @RequestBody JobApplication updatedJob) {
+            @Valid @RequestBody JobApplication updatedJob) {
 
         if (!repository.existsById(id)) {
             return ResponseEntity.notFound().build();
