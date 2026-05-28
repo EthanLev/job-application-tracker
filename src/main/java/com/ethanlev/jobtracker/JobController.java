@@ -79,5 +79,4 @@ public class JobController {
         repository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
-
 }
