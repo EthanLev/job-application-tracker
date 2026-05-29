@@ -31,7 +31,7 @@ public class JobController {
         }
 
         if (location != null && !location.isBlank()) {
-            return repository.findByLocation(location);
+            return repository.findByLocationContainingIgnoreCase(location);
         }
 
         return repository.findAll();

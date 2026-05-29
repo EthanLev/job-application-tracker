@@ -12,5 +12,5 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
     List<JobApplication> findByStatus(String status);
 
     // SELECT * FROM job_application WHERE location = ?
-    List<JobApplication> findByLocation(String location);
+    List<JobApplication> findByLocationContainingIgnoreCase(String location);
 }
