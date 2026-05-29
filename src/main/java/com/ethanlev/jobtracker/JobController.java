@@ -24,9 +24,14 @@ public class JobController {
 
     // GET /jobs — fetch all jobs from the database
     @GetMapping
-    public List<JobApplication> getAllJobs(@RequestParam(required = false) String status) {
+    public List<JobApplication> getAllJobs(@RequestParam(required = false) String status,
+                                           @RequestParam(required = false) String location) {
         if (status != null && !status.isBlank()) {
             return repository.findByStatus(status);
+        }
+
+        if (location != null && !location.isBlank()) {
+            return repository.findByLocation(location);
         }
 
         return repository.findAll();
